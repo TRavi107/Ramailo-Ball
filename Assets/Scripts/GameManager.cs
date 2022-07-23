@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
     bool paused;
     float startTime;
     bool gameStarted;
+    float highscore;
 
     #endregion
 
@@ -74,8 +75,15 @@ public class GameManager : MonoBehaviour
         StopCoroutine(nameof(SpawnBallsCour));
         StartCoroutine(nameof(SpawnBallsCour));
         Time.timeScale = 1;
-        setHighScore(gamePlayhighscoreText);
         startTime = Time.time;
+        ScoreAPI.GetData((bool s, Data_RequestData d) => {
+            if (s)
+            {
+                highscore = d.high_score;
+            }
+        });
+        setHighScore(gamePlayhighscoreText);
+
     }
 
 
@@ -226,23 +234,13 @@ public class GameManager : MonoBehaviour
 
     void setHighScore(TMP_Text highscroreTextUI)
     {
-        ScoreAPI.GetData((bool s, Data_RequestData d) => {
-            if (s)
-            {
-                if (score >= d.high_score)
-                {
-                    highscroreTextUI.text = score.ToString();
-
-                }
-                else
-                {
-                    highscroreTextUI.text = d.high_score.ToString();
-                }
-
-            }
-        });
+        if (score >= highscore)
+        {
+            highscore = score;
+        }
+        highscroreTextUI.text = highscore.ToString();
     }
-    
+
     void GetHighScore()
     {
         ScoreAPI.GetData((bool s, Data_RequestData d) => {
